@@ -12,10 +12,17 @@ type Todo struct {
 }
 
 func CreateTodo(title string, body string) (*Todo, error) {
+  tx, err := db.Begin()
+  if err != nil {
+    return nil, err
+  }
+  defer tx.Rollback()
+
   stmt, err := db.Prepare("INSERT INTO todos(title, body, added_on) VALUES(?, ?, ?)")
   if err != nil {
     return nil, err
   }
+  defer stmt.Close()
 
   addedOn := time.Now()
   res, err := stmt.Exec(title, body, addedOn)
@@ -26,6 +33,11 @@ func CreateTodo(title string, body string) (*Todo, error) {
   }
 
   _, err = res.RowsAffected()
+  if err != nil {
+    return nil, err
+  }
+
+  err = tx.Commit()
   if err != nil {
     return nil, err
   }

@@ -18,7 +18,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
     "body": &graphql.Field{
       Type: graphql.String,
     },
-    "added_on": &graphql.Field{
+    "created_at": &graphql.Field{
       Type: graphql.String,
     },
   },

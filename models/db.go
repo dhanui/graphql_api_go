@@ -31,7 +31,8 @@ func InitDB() error {
     return err
   }
 
-  connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name)
+  connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+    dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name)
   db, err = sql.Open("mysql", connString)
   if err != nil {
     return err

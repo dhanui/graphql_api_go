@@ -8,7 +8,7 @@ type Todo struct {
   Id int `json:"id"`
   Title string `json:"title"`
   Body string `json:"body"`
-  AddedOn time.Time `json:"added_on"`
+  CreatedAt time.Time `json:"created_at"`
 }
 
 func CreateTodo(title string, body string) (*Todo, error) {
@@ -18,14 +18,14 @@ func CreateTodo(title string, body string) (*Todo, error) {
   }
   defer tx.Rollback()
 
-  stmt, err := db.Prepare("INSERT INTO todos(title, body, added_on) VALUES(?, ?, ?)")
+  stmt, err := db.Prepare("INSERT INTO todos(title, body, created_at) VALUES(?, ?, ?)")
   if err != nil {
     return nil, err
   }
   defer stmt.Close()
 
-  addedOn := time.Now()
-  res, err := stmt.Exec(title, body, addedOn)
+  createdAt := time.Now()
+  res, err := stmt.Exec(title, body, createdAt)
 
   lastId, err := res.LastInsertId()
   if err != nil {
@@ -46,7 +46,7 @@ func CreateTodo(title string, body string) (*Todo, error) {
     Id: int(lastId),
     Title: title,
     Body: body,
-    AddedOn: addedOn,
+    CreatedAt: createdAt,
   }
 
   return &newTodo, nil
@@ -55,7 +55,7 @@ func CreateTodo(title string, body string) (*Todo, error) {
 func GetTodo(id int) (*Todo, error) {
   todo := Todo{}
 
-  err := db.QueryRow("SELECT * FROM todos WHERE id = ?", id).Scan(&todo.Id, &todo.Title, &todo.Body, &todo.AddedOn)
+  err := db.QueryRow("SELECT * FROM todos WHERE id = ?", id).Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
   if err != nil {
     return nil, err
   }
@@ -73,7 +73,7 @@ func GetTodoList() ([]Todo, error) {
   defer rows.Close()
   for rows.Next() {
     todo := Todo{}
-    err := rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.AddedOn)
+    err := rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
     if err != nil {
       return nil, err
     }

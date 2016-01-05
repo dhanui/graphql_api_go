@@ -10,10 +10,25 @@ import (
 )
 
 func graphqlHandler(w http.ResponseWriter, r *http.Request) {
-  result := schema.ExecuteQuery(r.URL.Query()["query"][0])
+  if r.Method == "GET" {
+    result := schema.ExecuteQuery(r.URL.Query()["query"][0])
 
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(result)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(result)
+  } else if r.Method == "POST" {
+    body := make([]byte, r.ContentLength)
+    _, err := r.Body.Read(body)
+    if err != nil {
+      result := schema.ExecuteQuery(string(body[:]))
+
+      w.Header().Set("Content-Type", "application/json")
+      json.NewEncoder(w).Encode(result)
+    } else {
+      http.Error(w, "Bad Request", http.StatusBadRequest)
+    }
+  } else {
+    http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+  }
 }
 
 func main() {

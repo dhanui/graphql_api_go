@@ -32,7 +32,7 @@ func graphqlHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  err := models.InitDB()
+  err := models.InitDBConnection()
   if (err != nil) {
     fmt.Printf("Error establishing connection to database: %v\n", err)
     return

@@ -19,7 +19,7 @@ type DBConf struct {
 
 var db *sql.DB
 
-func InitDB() error {
+func InitDBConnection() error {
   file, err := os.Open("database.json")
   if err != nil {
     return err

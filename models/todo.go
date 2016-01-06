@@ -11,78 +11,63 @@ type Todo struct {
   CreatedAt time.Time `json:"created_at"`
 }
 
-func CreateTodo(title string, body string) (*Todo, error) {
+func CreateTodo(title string, body string) (newTodo Todo, err error) {
+  newTodo = Todo{
+    Title: title,
+    Body: body,
+    CreatedAt: time.Now(),
+  }
+
   tx, err := db.Begin()
   if err != nil {
-    return nil, err
+    return
   }
   defer tx.Rollback()
 
   stmt, err := db.Prepare("INSERT INTO todos(title, body, created_at) VALUES(?, ?, ?)")
   if err != nil {
-    return nil, err
+    return
   }
   defer stmt.Close()
 
-  createdAt := time.Now()
-  res, err := stmt.Exec(title, body, createdAt)
+  res, err := stmt.Exec(newTodo.Title, newTodo.Body, newTodo.CreatedAt)
 
   lastId, err := res.LastInsertId()
   if err != nil {
-    return nil, err
+    return
   }
+  newTodo.Id = int(lastId)
 
   _, err = res.RowsAffected()
   if err != nil {
-    return nil, err
+    return
   }
 
   err = tx.Commit()
-  if err != nil {
-    return nil, err
-  }
-
-  newTodo := Todo{
-    Id: int(lastId),
-    Title: title,
-    Body: body,
-    CreatedAt: createdAt,
-  }
-
-  return &newTodo, nil
+  return
 }
 
-func GetTodo(id int) (*Todo, error) {
-  todo := Todo{}
-
-  err := db.QueryRow("SELECT * FROM todos WHERE id = ?", id).Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
-  if err != nil {
-    return nil, err
-  }
-
-  return &todo, nil
+func GetTodo(id int) (todo Todo, err error) {
+  todo = Todo{}
+  err = db.QueryRow("SELECT * FROM todos WHERE id = ?", id).
+    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
+  return
 }
 
-func GetTodoList() ([]Todo, error) {
-  var todos []Todo
-
+func GetTodoList() (todos []Todo, err error) {
   rows, err := db.Query("SELECT * FROM todos")
   if err != nil {
-    return nil, err
+    return
   }
   defer rows.Close()
   for rows.Next() {
     todo := Todo{}
-    err := rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
     if err != nil {
-      return nil, err
+      return
     }
     todos = append(todos, todo)
   }
   err = rows.Err()
-  if err != nil {
-    return nil, err
-  }
-
-  return todos, nil
+  return
 }

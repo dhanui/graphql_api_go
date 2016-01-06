@@ -52,13 +52,13 @@ func CreateUser(name string, email string) (newUser User, err error) {
 
 func GetUser(id int) (user User, err error) {
   user = User{}
-  err = db.QueryRow("SELECT * FROM users WHERE id = ?", id).
+  err = db.QueryRow("SELECT id, name, email, created_at FROM users WHERE id = ?", id).
     Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt)
   return
 }
 
 func GetUserList() (users []User, err error) {
-  rows, err := db.Query("SELECT * FROM users")
+  rows, err := db.Query("SELECT id, name, email, created_at FROM users")
   if err != nil {
     return
   }

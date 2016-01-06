@@ -16,6 +16,9 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
         "body": &graphql.ArgumentConfig{
           Type: graphql.NewNonNull(graphql.String),
         },
+        "user_id": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.Int),
+        },
       },
       Resolve: createTodo,
     },

@@ -39,8 +39,9 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 func createTodo(params graphql.ResolveParams) (interface{}, error) {
   title, _ := params.Args["title"].(string)
   body, _ := params.Args["body"].(string)
+  userId, _ := params.Args["user_id"].(int)
 
-  newTodo, err := models.CreateTodo(title, body)
+  newTodo, err := models.CreateTodo(title, body, userId)
   if err != nil {
     return nil, err
   } else {

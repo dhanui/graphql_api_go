@@ -11,6 +11,45 @@ type User struct {
   CreatedAt time.Time `json:"created_at"`
 }
 
+func CreateUser(name string, email string) (newUser User, err error) {
+  newUser = User{
+    Name: name,
+    Email: email,
+    CreatedAt: time.Now(),
+  }
+
+  tx, err := db.Begin()
+  if err != nil {
+    return
+  }
+  defer tx.Rollback()
+
+  stmt, err := db.Prepare("INSERT INTO users(name, email, created_at) VALUES(?, ?, ?)")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+
+  res, err := stmt.Exec(newUser.Name, newUser.Email, newUser.CreatedAt)
+  if err != nil {
+    return
+  }
+
+  lastId, err := res.LastInsertId()
+  if err != nil {
+    return
+  }
+  newUser.Id = int(lastId)
+
+  _, err = res.RowsAffected()
+  if err != nil {
+    return
+  }
+
+  err = tx.Commit()
+  return
+}
+
 func GetUser(id int) (user User, err error) {
   user = User{}
   err = db.QueryRow("SELECT * FROM users WHERE id = ?", id).

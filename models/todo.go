@@ -32,6 +32,9 @@ func CreateTodo(title string, body string) (newTodo Todo, err error) {
   defer stmt.Close()
 
   res, err := stmt.Exec(newTodo.Title, newTodo.Body, newTodo.CreatedAt)
+  if err != nil {
+    return
+  }
 
   lastId, err := res.LastInsertId()
   if err != nil {

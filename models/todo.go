@@ -8,6 +8,7 @@ type Todo struct {
   Id int `json:"id"`
   Title string `json:"title"`
   Body string `json:"body"`
+  UserId int
   CreatedAt time.Time `json:"created_at"`
 }
 
@@ -49,20 +50,20 @@ func CreateTodo(title string, body string) (newTodo Todo, err error) {
 
 func GetTodo(id int) (todo Todo, err error) {
   todo = Todo{}
-  err = db.QueryRow("SELECT * FROM todos WHERE id = ?", id).
-    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
+  err = db.QueryRow("SELECT id, title, body, user_id, created_at FROM todos WHERE id = ?", id).
+    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt)
   return
 }
 
 func GetTodoList() (todos []Todo, err error) {
-  rows, err := db.Query("SELECT * FROM todos")
+  rows, err := db.Query("SELECT id, title, body, user_id, created_at FROM todos")
   if err != nil {
     return
   }
   defer rows.Close()
   for rows.Next() {
     todo := Todo{}
-    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.CreatedAt)
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt)
     if err != nil {
       return
     }

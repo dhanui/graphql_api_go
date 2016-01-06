@@ -18,6 +18,18 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
     "body": &graphql.Field{
       Type: graphql.String,
     },
+    "user": &graphql.Field{
+      Type: userType,
+      Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+        todo, _ := params.Source.(models.Todo)
+        user, err := models.GetUser(todo.UserId)
+        if err != nil {
+          return nil, err
+        } else {
+          return user, nil
+        }
+      },
+    },
     "created_at": &graphql.Field{
       Type: graphql.String,
     },
@@ -38,7 +50,6 @@ func createTodo(params graphql.ResolveParams) (interface{}, error) {
 
 func getTodo(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-
   todo, err := models.GetTodo(id)
   if err != nil {
     return nil, err

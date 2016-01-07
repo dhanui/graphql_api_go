@@ -40,6 +40,15 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
       },
       Resolve: updateTodo,
     },
+    "deleteTodo": &graphql.Field{
+      Type: todoType,
+      Args: graphql.FieldConfigArgument{
+        "id": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.Int),
+        },
+      },
+      Resolve: deleteTodo,
+    },
     "createUser": &graphql.Field{
       Type: userType,
       Args: graphql.FieldConfigArgument{
@@ -66,6 +75,15 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
         },
       },
       Resolve: updateUser,
+    },
+    "deleteUser": &graphql.Field{
+      Type: userType,
+      Args: graphql.FieldConfigArgument{
+        "id": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.Int),
+        },
+      },
+      Resolve: deleteUser,
     },
   },
 })

@@ -43,7 +43,6 @@ func createTodo(params graphql.ResolveParams) (interface{}, error) {
   title, _ := params.Args["title"].(string)
   body, _ := params.Args["body"].(string)
   userId, _ := params.Args["user_id"].(int)
-
   newTodo := models.Todo{
     Title: title,
     Body: body,
@@ -63,7 +62,6 @@ func updateTodo(params graphql.ResolveParams) (interface{}, error) {
   if err != nil {
     return nil, err
   }
-
   title, ok := params.Args["title"].(string)
   if ok {
     todo.Title = title
@@ -77,6 +75,20 @@ func updateTodo(params graphql.ResolveParams) (interface{}, error) {
     todo.UserId = userId
   }
   err = todo.Update()
+  if err != nil {
+    return nil, err
+  } else {
+    return todo, nil
+  }
+}
+
+func deleteTodo(params graphql.ResolveParams) (interface{}, error) {
+  id, _ := params.Args["id"].(int)
+  todo, err := models.GetTodo(id)
+  if err != nil {
+    return nil, err
+  }
+  err = todo.Delete()
   if err != nil {
     return nil, err
   } else {

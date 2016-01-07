@@ -43,6 +43,29 @@ func createUser(params graphql.ResolveParams) (interface{}, error) {
   }
 }
 
+func updateUser(params graphql.ResolveParams) (interface{}, error) {
+  id, _ := params.Args["id"].(int)
+  user, err := models.GetUser(id)
+  if err != nil {
+    return nil, err
+  }
+
+  name, ok := params.Args["name"].(string)
+  if ok {
+    user.Name = name
+  }
+  email, ok := params.Args["email"].(string)
+  if ok {
+    user.Email = email
+  }
+  err = user.Update()
+  if err != nil {
+    return nil, err
+  } else {
+    return user, nil
+  }
+}
+
 func getUser(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
 

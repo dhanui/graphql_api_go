@@ -52,5 +52,20 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
       },
       Resolve: createUser,
     },
+    "updateUser": &graphql.Field{
+      Type: userType,
+      Args: graphql.FieldConfigArgument{
+        "id": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.Int),
+        },
+        "name": &graphql.ArgumentConfig{
+          Type: graphql.String,
+        },
+        "email": &graphql.ArgumentConfig{
+          Type: graphql.String,
+        },
+      },
+      Resolve: updateUser,
+    },
   },
 })

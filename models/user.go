@@ -42,6 +42,29 @@ func (user *User) Create() (err error) {
   return
 }
 
+func (user *User) Update() (err error) {
+  tx, err := db.Begin()
+  if err != nil {
+    return
+  }
+  defer tx.Rollback()
+
+  stmt, err := db.Prepare("UPDATE users SET name = ?, email = ?, updated_at = ? WHERE id = ?")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+
+  user.UpdatedAt = time.Now()
+  _, err = stmt.Exec(user.Name, user.Email, user.UpdatedAt, user.Id)
+  if err != nil {
+    return
+  }
+
+  err = tx.Commit()
+  return
+}
+
 func GetUser(id int) (user User, err error) {
   user = User{}
   err = db.QueryRow("SELECT id, name, email, created_at, updated_at FROM users WHERE id = ?", id).

@@ -21,6 +21,9 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
     "created_at": &graphql.Field{
       Type: graphql.String,
     },
+    "updated_at": &graphql.Field{
+      Type: graphql.String,
+    },
   },
 })
 
@@ -28,7 +31,11 @@ func createUser(params graphql.ResolveParams) (interface{}, error) {
   name, _ := params.Args["name"].(string)
   email, _ := params.Args["email"].(string)
 
-  newUser, err := models.CreateUser(name, email)
+  newUser := models.User{
+    Name: name,
+    Email: email,
+  }
+  err := newUser.Create()
   if err != nil {
     return nil, err
   } else {

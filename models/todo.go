@@ -10,29 +10,25 @@ type Todo struct {
   Body string `json:"body"`
   UserId int
   CreatedAt time.Time `json:"created_at"`
+  UpdatedAt time.Time `json:"updated_at"`
 }
 
-func CreateTodo(title string, body string, userId int) (newTodo Todo, err error) {
-  newTodo = Todo{
-    Title: title,
-    Body: body,
-    UserId: userId,
-    CreatedAt: time.Now(),
-  }
-
+func (todo *Todo) Create() (err error) {
   tx, err := db.Begin()
   if err != nil {
     return
   }
   defer tx.Rollback()
 
-  stmt, err := db.Prepare("INSERT INTO todos(title, body, user_id, created_at) VALUES(?, ?, ?, ?)")
+  stmt, err := db.Prepare("INSERT INTO todos(title, body, user_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?)")
   if err != nil {
     return
   }
   defer stmt.Close()
 
-  res, err := stmt.Exec(newTodo.Title, newTodo.Body, newTodo.UserId, newTodo.CreatedAt)
+  todo.CreatedAt = time.Now()
+  todo.UpdatedAt = todo.CreatedAt
+  res, err := stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.CreatedAt, todo.UpdatedAt)
   if err != nil {
     return
   }
@@ -41,9 +37,27 @@ func CreateTodo(title string, body string, userId int) (newTodo Todo, err error)
   if err != nil {
     return
   }
-  newTodo.Id = int(lastId)
+  todo.Id = int(lastId)
 
-  _, err = res.RowsAffected()
+  err = tx.Commit()
+  return
+}
+
+func (todo *Todo) Update() (err error) {
+  tx, err := db.Begin()
+  if err != nil {
+    return
+  }
+  defer tx.Rollback()
+
+  stmt, err := db.Prepare("UPDATE todos SET title = ?, body = ?, user_id = ?, updated_at = ? WHERE id = ?")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+
+  todo.UpdatedAt = time.Now()
+  _, err = stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.UpdatedAt, todo.Id)
   if err != nil {
     return
   }
@@ -54,20 +68,20 @@ func CreateTodo(title string, body string, userId int) (newTodo Todo, err error)
 
 func GetTodo(id int) (todo Todo, err error) {
   todo = Todo{}
-  err = db.QueryRow("SELECT id, title, body, user_id, created_at FROM todos WHERE id = ?", id).
-    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt)
+  err = db.QueryRow("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE id = ?", id).
+    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
   return
 }
 
 func GetTodoList() (todos []Todo, err error) {
-  rows, err := db.Query("SELECT id, title, body, user_id, created_at FROM todos")
+  rows, err := db.Query("SELECT id, title, body, user_id, created_at, updated_at FROM todos")
   if err != nil {
     return
   }
   defer rows.Close()
   for rows.Next() {
     todo := Todo{}
-    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt)
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
     if err != nil {
       return
     }

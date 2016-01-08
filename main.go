@@ -15,11 +15,7 @@ func graphqlHandler(w http.ResponseWriter, r *http.Request) {
     http.Error(w, "Unauthorized", http.StatusUnauthorized)
     return
   }
-  if r.Method == "GET" {
-    result := schema.ExecuteQuery(r.URL.Query()["query"][0])
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(result)
-  } else if r.Method == "POST" {
+  if r.Method == "POST" {
     body := make([]byte, r.ContentLength)
     _, err := r.Body.Read(body)
     if err != nil {

@@ -58,6 +58,9 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
         "email": &graphql.ArgumentConfig{
           Type: graphql.NewNonNull(graphql.String),
         },
+        "password": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.String),
+        },
       },
       Resolve: createUser,
     },

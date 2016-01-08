@@ -30,11 +30,12 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 func createUser(params graphql.ResolveParams) (interface{}, error) {
   name, _ := params.Args["name"].(string)
   email, _ := params.Args["email"].(string)
+  password, _ := params.Args["password"].(string)
   newUser := models.User{
     Name: name,
     Email: email,
   }
-  err := newUser.Create()
+  err := newUser.Create(password)
   if err != nil {
     return nil, err
   } else {

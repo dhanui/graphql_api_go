@@ -19,29 +19,23 @@ type DBConf struct {
 
 var db *sql.DB
 
-func InitDBConnection() error {
+func InitDBConnection() (err error) {
   file, err := os.Open("database.json")
   if err != nil {
-    return err
+    return
   }
   decoder := json.NewDecoder(file)
   dbConf := DBConf{}
   err = decoder.Decode(&dbConf)
   if err != nil {
-    return err
+    return
   }
-
   connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
     dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name)
   db, err = sql.Open("mysql", connString)
   if err != nil {
-    return err
+    return
   }
-
   err = db.Ping()
-  if err != nil {
-    return err
-  }
-
-  return err
+  return
 }

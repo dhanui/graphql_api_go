@@ -2,6 +2,8 @@ package models
 
 import (
   "time"
+
+  "../helpers"
 )
 
 type User struct {
@@ -12,20 +14,24 @@ type User struct {
   UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (user *User) Create() (err error) {
+func (user *User) Create(password string) (err error) {
+  passwordHash, err := helpers.CreateHash(password)
+  if err != nil {
+    return
+  }
   tx, err := db.Begin()
   if err != nil {
     return
   }
   defer tx.Rollback()
-  stmt, err := db.Prepare("INSERT INTO users(name, email, created_at, updated_at) VALUES(?, ?, ?, ?)")
+  stmt, err := db.Prepare("INSERT INTO users(name, email, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?, ?)")
   if err != nil {
     return
   }
   defer stmt.Close()
   user.CreatedAt = time.Now()
   user.UpdatedAt = user.CreatedAt
-  res, err := stmt.Exec(user.Name, user.Email, user.CreatedAt, user.UpdatedAt)
+  res, err := stmt.Exec(user.Name, user.Email, passwordHash, user.CreatedAt, user.UpdatedAt)
   if err != nil {
     return
   }
@@ -100,4 +106,14 @@ func GetUserList() (users []User, err error) {
   }
   err = rows.Err()
   return
+}
+
+func AuthenticateUser(username string, password string) bool {
+  var passwordHash string
+  err := db.QueryRow("SELECT password_hash FROM users WHERE email = ?", username).Scan(&passwordHash)
+  if err != nil {
+    return false
+  } else {
+    return helpers.ValidateHash(password, passwordHash)
+  }
 }

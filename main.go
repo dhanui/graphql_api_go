@@ -33,10 +33,12 @@ func graphqlHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
   err := models.InitDBConnection()
   if (err != nil) {
-    fmt.Printf("Error establishing connection to database: %v\n", err)
+    fmt.Printf("Error establishing connection to database: %s\n", err.Error())
     return
   }
   http.HandleFunc("/graphql", graphqlHandler)
-  fmt.Printf("HTTP listening to port 8080\n")
-  http.ListenAndServe(":8080", nil)
+  err = http.ListenAndServe(":8080", nil)
+  if err != nil {
+    fmt.Printf("Error starting HTTP server: %s\n", err.Error())
+  }
 }

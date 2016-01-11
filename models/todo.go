@@ -85,6 +85,24 @@ func GetTodo(id int) (todo Todo, err error) {
   return
 }
 
+func GetTodoListFilteredByUserId(userId int) (todos []Todo, err error) {
+  rows, err := db.Query("SELECT id, title, body , user_id, created_at, updated_at FROM todos WHERE user_id = ? AND deleted_at IS NULL", userId)
+  if err != nil {
+    return
+  }
+  defer rows.Close()
+  for rows.Next() {
+    todo := Todo{}
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
+    if err != nil {
+      return
+    }
+    todos = append(todos, todo)
+  }
+  err = rows.Err()
+  return
+}
+
 func GetTodoList() (todos []Todo, err error) {
   rows, err := db.Query("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE deleted_at IS NULL")
   if err != nil {

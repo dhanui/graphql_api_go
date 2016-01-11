@@ -90,6 +90,16 @@ func getUser(params graphql.ResolveParams) (interface{}, error) {
   }
 }
 
+func getUserFromTodo(params graphql.ResolveParams) (interface{}, error) {
+  todo, _ := params.Source.(models.Todo)
+  user, err := models.GetUser(todo.UserId)
+  if err != nil {
+    return nil, err
+  } else {
+    return user, nil
+  }
+}
+
 func getUserList(params graphql.ResolveParams) (interface{}, error) {
   users, err := models.GetUserList()
   if err != nil {

@@ -11,15 +11,32 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
       Type: todoType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
-          Type: graphql.Int,
+          Type: graphql.NewNonNull(graphql.Int),
         },
       },
       Resolve: getTodo,
     },
     "todoList": &graphql.Field{
       Type: graphql.NewList(todoType),
-      Description: "List of todos",
+      Args: graphql.FieldConfigArgument{
+        "user_id": &graphql.ArgumentConfig{
+          Type: graphql.Int,
+        },
+      },
       Resolve: getTodoList,
+    },
+    "user": &graphql.Field{
+      Type: userType,
+      Args: graphql.FieldConfigArgument{
+        "id": &graphql.ArgumentConfig{
+          Type: graphql.NewNonNull(graphql.Int),
+        },
+      },
+      Resolve: getUser,
+    },
+    "userList": &graphql.Field{
+      Type: graphql.NewList(userType),
+      Resolve: getUserList,
     },
   },
 })

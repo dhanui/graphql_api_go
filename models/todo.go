@@ -8,69 +8,115 @@ type Todo struct {
   Id int `json:"id"`
   Title string `json:"title"`
   Body string `json:"body"`
-  AddedOn time.Time `json:"added_on"`
+  UserId int
+  CreatedAt time.Time `json:"created_at"`
+  UpdatedAt time.Time `json:"updated_at"`
 }
 
-func CreateTodo(title string, body string) (*Todo, error) {
-  stmt, err := db.Prepare("INSERT INTO todos(title, body, added_on) VALUES(?, ?, ?)")
+func (todo *Todo) Create() (err error) {
+  tx, err := db.Begin()
   if err != nil {
-    return nil, err
+    return
   }
-
-  addedOn := time.Now()
-  res, err := stmt.Exec(title, body, addedOn)
-
+  defer tx.Rollback()
+  stmt, err := db.Prepare("INSERT INTO todos(title, body, user_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?)")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+  todo.CreatedAt = time.Now()
+  todo.UpdatedAt = todo.CreatedAt
+  res, err := stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.CreatedAt, todo.UpdatedAt)
+  if err != nil {
+    return
+  }
   lastId, err := res.LastInsertId()
   if err != nil {
-    return nil, err
+    return
   }
-
-  _, err = res.RowsAffected()
-  if err != nil {
-    return nil, err
-  }
-
-  newTodo := Todo{
-    Id: int(lastId),
-    Title: title,
-    Body: body,
-    AddedOn: addedOn,
-  }
-
-  return &newTodo, nil
+  todo.Id = int(lastId)
+  err = tx.Commit()
+  return
 }
 
-func GetTodo(id int) (*Todo, error) {
-  todo := Todo{}
-
-  err := db.QueryRow("SELECT * FROM todos WHERE id = ?", id).Scan(&todo.Id, &todo.Title, &todo.Body, &todo.AddedOn)
+func (todo *Todo) Update() (err error) {
+  tx, err := db.Begin()
   if err != nil {
-    return nil, err
+    return
   }
-
-  return &todo, nil
+  defer tx.Rollback()
+  stmt, err := db.Prepare("UPDATE todos SET title = ?, body = ?, user_id = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+  todo.UpdatedAt = time.Now()
+  _, err = stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.UpdatedAt, todo.Id)
+  if err != nil {
+    return
+  }
+  err = tx.Commit()
+  return
 }
 
-func GetTodoList() ([]Todo, error) {
-  var todos []Todo
-
-  rows, err := db.Query("SELECT * FROM todos")
+func (todo *Todo) Delete() (err error) {
+  tx, err := db.Begin()
   if err != nil {
-    return nil, err
+    return
+  }
+  defer tx.Rollback()
+  stmt, err := db.Prepare("UPDATE todos SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL")
+  if err != nil {
+    return
+  }
+  defer stmt.Close()
+  _, err = stmt.Exec(time.Now(), todo.Id)
+  if err != nil {
+    return
+  }
+  err = tx.Commit()
+  return
+}
+
+func GetTodo(id int) (todo Todo, err error) {
+  todo = Todo{}
+  err = db.QueryRow("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE id = ? AND deleted_at IS NULL", id).
+    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
+  return
+}
+
+func GetTodoListFilteredByUserId(userId int) (todos []Todo, err error) {
+  rows, err := db.Query("SELECT id, title, body , user_id, created_at, updated_at FROM todos WHERE user_id = ? AND deleted_at IS NULL", userId)
+  if err != nil {
+    return
   }
   defer rows.Close()
   for rows.Next() {
     todo := Todo{}
-    err := rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.AddedOn)
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
     if err != nil {
-      return nil, err
+      return
     }
     todos = append(todos, todo)
   }
   err = rows.Err()
-  if err != nil {
-    return nil, err
-  }
+  return
+}
 
-  return todos, nil
+func GetTodoList() (todos []Todo, err error) {
+  rows, err := db.Query("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE deleted_at IS NULL")
+  if err != nil {
+    return
+  }
+  defer rows.Close()
+  for rows.Next() {
+    todo := Todo{}
+    err = rows.Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
+    if err != nil {
+      return
+    }
+    todos = append(todos, todo)
+  }
+  err = rows.Err()
+  return
 }

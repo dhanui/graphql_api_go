@@ -18,7 +18,14 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
     "body": &graphql.Field{
       Type: graphql.String,
     },
-    "added_on": &graphql.Field{
+    "user": &graphql.Field{
+      Type: userType,
+      Resolve: getUserFromTodo,
+    },
+    "created_at": &graphql.Field{
+      Type: graphql.String,
+    },
+    "updated_at": &graphql.Field{
       Type: graphql.String,
     },
   },
@@ -27,8 +34,13 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 func createTodo(params graphql.ResolveParams) (interface{}, error) {
   title, _ := params.Args["title"].(string)
   body, _ := params.Args["body"].(string)
-
-  newTodo, err := models.CreateTodo(title, body)
+  userId, _ := params.Args["user_id"].(int)
+  newTodo := models.Todo{
+    Title: title,
+    Body: body,
+    UserId: userId,
+  }
+  err := newTodo.Create()
   if err != nil {
     return nil, err
   } else {
@@ -36,9 +48,48 @@ func createTodo(params graphql.ResolveParams) (interface{}, error) {
   }
 }
 
+func updateTodo(params graphql.ResolveParams) (interface{}, error) {
+  id, _ := params.Args["id"].(int)
+  todo, err := models.GetTodo(id)
+  if err != nil {
+    return nil, err
+  }
+  title, ok := params.Args["title"].(string)
+  if ok {
+    todo.Title = title
+  }
+  body, ok := params.Args["body"].(string)
+  if ok {
+    todo.Body = body
+  }
+  userId, ok := params.Args["user_id"].(int)
+  if ok {
+    todo.UserId = userId
+  }
+  err = todo.Update()
+  if err != nil {
+    return nil, err
+  } else {
+    return todo, nil
+  }
+}
+
+func deleteTodo(params graphql.ResolveParams) (interface{}, error) {
+  id, _ := params.Args["id"].(int)
+  todo, err := models.GetTodo(id)
+  if err != nil {
+    return nil, err
+  }
+  err = todo.Delete()
+  if err != nil {
+    return nil, err
+  } else {
+    return todo, nil
+  }
+}
+
 func getTodo(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-
   todo, err := models.GetTodo(id)
   if err != nil {
     return nil, err
@@ -48,7 +99,14 @@ func getTodo(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func getTodoList(params graphql.ResolveParams) (interface{}, error) {
-  todos, err := models.GetTodoList()
+  userId, ok := params.Args["user_id"].(int)
+  var todos []models.Todo
+  var err error
+  if ok {
+    todos, err = models.GetTodoListFilteredByUserId(userId)
+  } else {
+    todos, err = models.GetTodoList()
+  }
   if err != nil {
     return nil, err
   } else {

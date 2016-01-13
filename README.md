@@ -28,6 +28,7 @@ A GrahQL API server written in Go.
 ## Sending Query
 
 Queries are sent as request payload of HTTP POST command. Example using curl:
+
     $ curl -X POST -d "{
         __schema {
           types {

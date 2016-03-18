@@ -19,14 +19,9 @@ func (todo *Todo) Create() (err error) {
     return
   }
   defer tx.Rollback()
-  stmt, err := db.Prepare("INSERT INTO todos(title, body, user_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?)")
-  if err != nil {
-    return
-  }
-  defer stmt.Close()
   todo.CreatedAt = time.Now()
   todo.UpdatedAt = todo.CreatedAt
-  res, err := stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.CreatedAt, todo.UpdatedAt)
+  res, err := createTodoStmt.Exec(todo.Title, todo.Body, todo.UserId, todo.CreatedAt, todo.UpdatedAt)
   if err != nil {
     return
   }
@@ -45,13 +40,8 @@ func (todo *Todo) Update() (err error) {
     return
   }
   defer tx.Rollback()
-  stmt, err := db.Prepare("UPDATE todos SET title = ?, body = ?, user_id = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL")
-  if err != nil {
-    return
-  }
-  defer stmt.Close()
   todo.UpdatedAt = time.Now()
-  _, err = stmt.Exec(todo.Title, todo.Body, todo.UserId, todo.UpdatedAt, todo.Id)
+  _, err = updateTodoStmt.Exec(todo.Title, todo.Body, todo.UserId, todo.UpdatedAt, todo.Id)
   if err != nil {
     return
   }
@@ -65,12 +55,7 @@ func (todo *Todo) Delete() (err error) {
     return
   }
   defer tx.Rollback()
-  stmt, err := db.Prepare("UPDATE todos SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL")
-  if err != nil {
-    return
-  }
-  defer stmt.Close()
-  _, err = stmt.Exec(time.Now(), todo.Id)
+  _, err = deleteTodoStmt.Exec(time.Now(), todo.Id)
   if err != nil {
     return
   }
@@ -80,13 +65,12 @@ func (todo *Todo) Delete() (err error) {
 
 func GetTodo(id int) (todo Todo, err error) {
   todo = Todo{}
-  err = db.QueryRow("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE id = ? AND deleted_at IS NULL", id).
-    Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
+  err = getTodoStmt.QueryRow(id).Scan(&todo.Id, &todo.Title, &todo.Body, &todo.UserId, &todo.CreatedAt, &todo.UpdatedAt)
   return
 }
 
 func GetTodoListFilteredByUserId(userId int) (todos []Todo, err error) {
-  rows, err := db.Query("SELECT id, title, body , user_id, created_at, updated_at FROM todos WHERE user_id = ? AND deleted_at IS NULL", userId)
+  rows, err := getTodosByUserIdStmt.Query(userId)
   if err != nil {
     return
   }
@@ -104,7 +88,7 @@ func GetTodoListFilteredByUserId(userId int) (todos []Todo, err error) {
 }
 
 func GetTodoList() (todos []Todo, err error) {
-  rows, err := db.Query("SELECT id, title, body, user_id, created_at, updated_at FROM todos WHERE deleted_at IS NULL")
+  rows, err := getAllTodosStmt.Query()
   if err != nil {
     return
   }

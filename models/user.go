@@ -92,12 +92,13 @@ func GetUserList() (users []User, err error) {
   return
 }
 
-func AuthenticateUser(username string, password string) bool {
+func AuthenticateUser(username string, password string) (user User, ok bool) {
   var passwordHash string
-  err := getUserByEmailStmt.QueryRow(username).Scan(&passwordHash)
+  user = User{}
+  err := getUserByEmailStmt.QueryRow(username).Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt, &passwordHash)
   if err != nil {
-    return false
+    return user, false
   } else {
-    return helpers.ValidateHash(password, passwordHash)
+    return user, helpers.ValidateHash(password, passwordHash)
   }
 }

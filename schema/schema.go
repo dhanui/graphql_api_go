@@ -4,6 +4,9 @@ import (
   "fmt"
 
   "github.com/graphql-go/graphql"
+  "golang.org/x/net/context"
+
+  "../models"
 )
 
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
@@ -11,10 +14,11 @@ var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
   Mutation: rootMutation,
 })
 
-func ExecuteQuery(query string) *graphql.Result {
+func ExecuteQuery(query string, user models.User) *graphql.Result {
   result := graphql.Do(graphql.Params{
     Schema: schema,
     RequestString: query,
+    Context: context.WithValue(context.Background(), "currentUser", user),
   })
   if len(result.Errors) > 0 {
     fmt.Printf("Request payload:\n%s\n", query)

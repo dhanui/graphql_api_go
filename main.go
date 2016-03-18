@@ -11,7 +11,11 @@ import (
 
 func graphqlHandler(w http.ResponseWriter, r *http.Request) {
   username, password, ok := r.BasicAuth()
-  if !ok || !models.AuthenticateUser(username, password) {
+  var user models.User
+  if ok {
+    user, ok = models.AuthenticateUser(username, password)
+  }
+  if !ok {
     http.Error(w, "Unauthorized", http.StatusUnauthorized)
     return
   }
@@ -19,7 +23,7 @@ func graphqlHandler(w http.ResponseWriter, r *http.Request) {
     body := make([]byte, r.ContentLength)
     _, err := r.Body.Read(body)
     if err != nil {
-      result := schema.ExecuteQuery(string(body[:]))
+      result := schema.ExecuteQuery(string(body[:]), user)
       w.Header().Set("Content-Type", "application/json")
       json.NewEncoder(w).Encode(result)
     } else {

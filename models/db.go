@@ -119,6 +119,6 @@ func prepareUserStmts() (err error) {
   if err != nil {
     return
   }
-  getUserByEmailStmt, err = db.Prepare("SELECT password_hash FROM users WHERE email = ? LIMIT 1")
+  getUserByEmailStmt, err = db.Prepare("SELECT id, name, email, created_at, updated_at, password_hash FROM users WHERE email = ? LIMIT 1")
   return
 }

@@ -1,6 +1,6 @@
 # GraphQL API Go
 
-A GrahQL API server written in Go.
+A GraphQL API server written in Go.
 
 ## Features
 

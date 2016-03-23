@@ -21,13 +21,13 @@ A GraphQL API server written in Go.
 ## Quick start
 
 1. Install dependencies
-2. Import [this](https://gist.githubusercontent.com/dhanui/9144519f8320fd69b860/raw/f8e524c5e4a7815e02bb48ac682aa212bd083d89/api_test.sql) MySQL database schema
+2. Import [this](https://gist.githubusercontent.com/dhanui/9144519f8320fd69b860/raw/f487a77459edde1be4050051358d6bb47cccba54/todo_api.sql) MySQL database schema
 3. Create `database.json` file from `database.sample.json` and save your database configuration
 4. Run the server `$ go run main.go`
 
 ## Sending Query
 
-Queries are sent as request payload of HTTP POST command. Example using curl:
+Queries are sent as request payload of HTTP POST command with HTTP Basic Authentication header. Example using curl:
 
     $ curl -X POST -d "{
         __schema {

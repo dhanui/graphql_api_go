@@ -1,7 +1,7 @@
 {
-  "host": "127.0.0.1",
+  "host": "localhost",
   "port": "3306",
   "user": "root",
   "pass": "",
-  "name": "api_test"
+  "name": "todo_api"
 }

@@ -26,7 +26,7 @@ func (user *User) Create(password string) (err error) {
   defer tx.Rollback()
   user.CreatedAt = time.Now()
   user.UpdatedAt = user.CreatedAt
-  res, err := createUserStmt.Exec(user.Name, user.Email, passwordHash, user.CreatedAt, user.UpdatedAt)
+  res, err := tx.Exec("INSERT INTO users(name, email, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?, ?)", user.Name, user.Email, passwordHash, user.CreatedAt, user.UpdatedAt)
   if err != nil {
     return
   }
@@ -46,7 +46,7 @@ func (user *User) Update() (err error) {
   }
   defer tx.Rollback()
   user.UpdatedAt = time.Now()
-  _, err = updateUserStmt.Exec(user.Name, user.Email, user.UpdatedAt, user.Id)
+  _, err = tx.Exec("UPDATE users SET name = ?, email = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL", user.Name, user.Email, user.UpdatedAt, user.Id)
   if err != nil {
     return
   }
@@ -60,7 +60,7 @@ func (user *User) Delete() (err error) {
     return
   }
   defer tx.Rollback()
-  _, err = deleteUserStmt.Exec(time.Now(), user.Id)
+  _, err = tx.Exec("UPDATE users SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL", time.Now(), user.Id)
   if err != nil {
     return
   }
@@ -70,12 +70,12 @@ func (user *User) Delete() (err error) {
 
 func GetUser(id int) (user User, err error) {
   user = User{}
-  err = getUserStmt.QueryRow(id).Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+  err = db.QueryRow("SELECT id, name, email, created_at, updated_at FROM users WHERE id = ? AND deleted_at IS NULL LIMIT 1", id).Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt)
   return
 }
 
 func GetUserList() (users []User, err error) {
-  rows, err := getAllUserStmt.Query()
+  rows, err := db.Query("SELECT id, name, email, created_at, updated_at FROM users WHERE deleted_at IS NULL")
   if err != nil {
     return
   }
@@ -95,7 +95,7 @@ func GetUserList() (users []User, err error) {
 func AuthenticateUser(username string, password string) (user User, ok bool) {
   var passwordHash string
   user = User{}
-  err := getUserByEmailStmt.QueryRow(username).Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt, &passwordHash)
+  err := db.QueryRow("SELECT id, name, email, created_at, updated_at, password_hash FROM users WHERE email = ? LIMIT 1", username).Scan(&user.Id, &user.Name, &user.Email, &user.CreatedAt, &user.UpdatedAt, &passwordHash)
   if err != nil {
     return user, false
   } else {

@@ -66,7 +66,7 @@ func main() {
         return
       }
       http.HandleFunc("/graphql", graphqlHandler)
-      fmt.Printf("Starting HTTP server on port 8080...\n")
+      fmt.Printf("HTTP server listening on port 8080...\n")
       err = http.ListenAndServe(":8080", nil)
       if err != nil {
         fmt.Printf("Error starting HTTP server: %s\n", err.Error())

@@ -6,7 +6,9 @@ import (
   "fmt"
   "database/sql"
 
+  "github.com/mattes/migrate/migrate"
   _ "github.com/go-sql-driver/mysql"
+  _ "github.com/mattes/migrate/driver/mysql"
 )
 
 type DBConf struct {
@@ -38,19 +40,10 @@ var (
 )
 
 func InitDBConnection() (err error) {
-  fmt.Printf("Loading database configuration...\n")
-  file, err := os.Open("database.json")
+  connString, err := loadConnectionString()
   if err != nil {
     return
   }
-  decoder := json.NewDecoder(file)
-  dbConf := DBConf{}
-  err = decoder.Decode(&dbConf)
-  if err != nil {
-    return
-  }
-  connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-    dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name)
   db, err = sql.Open("mysql", connString)
   if err != nil {
     return
@@ -71,6 +64,42 @@ func InitDBConnection() (err error) {
   }
   fmt.Printf("Statements preparation successful\n")
   return
+}
+
+func Migrate() (errors []error) {
+  connString, err := loadConnectionString()
+  if err != nil {
+    return append(errors, err)
+  }
+  url := fmt.Sprintf("mysql://%s", connString)
+  errors, _ = migrate.UpSync(url, "./migrations")
+  return
+}
+
+func Rollback() (errors []error) {
+  connString, err := loadConnectionString()
+  if err != nil {
+    return append(errors, err)
+  }
+  url := fmt.Sprintf("mysql://%s", connString)
+  errors, _ = migrate.DownSync(url, "./migrations")
+  return
+}
+
+func loadConnectionString() (connString string, err error) {
+  fmt.Printf("Loading database configuration...\n")
+  file, err := os.Open("database.json")
+  if err != nil {
+    return
+  }
+  decoder := json.NewDecoder(file)
+  dbConf := DBConf{}
+  err = decoder.Decode(&dbConf)
+  if err != nil {
+    return
+  }
+  return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+    dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name), nil
 }
 
 func prepareTodoStmts() (err error) {

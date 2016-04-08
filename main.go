@@ -2,6 +2,7 @@ package main
 
 import (
   "fmt"
+  "os"
   "net/http"
   "encoding/json"
 
@@ -34,16 +35,46 @@ func graphqlHandler(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-func main() {
-  err := models.InitDBConnection()
-  if (err != nil) {
-    fmt.Printf("Error initializing database connection: %s\n", err.Error())
-    return
+func printErrors(errors []error) {
+  for i := 0; i < len(errors); i++ {
+    fmt.Printf("* %s\n", errors[i].Error())
   }
-  http.HandleFunc("/graphql", graphqlHandler)
-  fmt.Printf("Starting HTTP server on port 8080...\n")
-  err = http.ListenAndServe(":8080", nil)
-  if err != nil {
-    fmt.Printf("Error starting HTTP server: %s\n", err.Error())
+}
+
+func main() {
+  if len(os.Args) == 2 {
+    if os.Args[1] == "migrate" {
+      errors := models.Migrate()
+      if len(errors) > 0 {
+        fmt.Println("Migration errors:")
+        printErrors(errors)
+      } else {
+        fmt.Println("Migration successful")
+      }
+    } else if os.Args[1] == "rollback" {
+      errors := models.Rollback()
+      if len(errors) > 0 {
+        fmt.Println("Rollback errors:")
+        printErrors(errors)
+      } else {
+        fmt.Println("Rollback successful")
+      }
+    } else if os.Args[1] == "server" {
+      err := models.InitDBConnection()
+      if (err != nil) {
+        fmt.Printf("Error initializing database connection: %s\n", err.Error())
+        return
+      }
+      http.HandleFunc("/graphql", graphqlHandler)
+      fmt.Printf("Starting HTTP server on port 8080...\n")
+      err = http.ListenAndServe(":8080", nil)
+      if err != nil {
+        fmt.Printf("Error starting HTTP server: %s\n", err.Error())
+      }
+    } else {
+      fmt.Printf("Unknown argument: %s\n", os.Args[1])
+    }
+  } else {
+    fmt.Println("Usage: graphql_api_go [command]\nCommands:\n  migrate\t\tMigrate database\n  rollback\t\tRollback database\n  server\t\tStart server\n")
   }
 }

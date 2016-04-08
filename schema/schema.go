@@ -6,7 +6,7 @@ import (
   "github.com/graphql-go/graphql"
   "golang.org/x/net/context"
 
-  "../models"
+  "github.com/dhanui/graphql_api_go/models"
 )
 
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{

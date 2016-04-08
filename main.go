@@ -5,8 +5,8 @@ import (
   "net/http"
   "encoding/json"
 
-  "./models"
-  "./schema"
+  "github.com/dhanui/graphql_api_go/models"
+  "github.com/dhanui/graphql_api_go/schema"
 )
 
 func graphqlHandler(w http.ResponseWriter, r *http.Request) {

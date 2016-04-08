@@ -3,7 +3,7 @@ package models
 import (
   "time"
 
-  "../helpers"
+  "github.com/dhanui/graphql_api_go/helpers"
 )
 
 type User struct {

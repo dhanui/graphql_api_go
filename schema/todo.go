@@ -3,7 +3,7 @@ package schema
 import (
   "github.com/graphql-go/graphql"
 
-  "../models"
+  "github.com/dhanui/graphql_api_go/models"
 )
 
 var todoType = graphql.NewObject(graphql.ObjectConfig{

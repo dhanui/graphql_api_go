@@ -6,6 +6,7 @@ A GraphQL API server written in Go.
 
 * Todo CRUD
 * User CRUD
+* Basic Authorization
 
 ## Requirements
 * Go 1.6+

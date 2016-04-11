@@ -10,8 +10,7 @@ A GraphQL API server written in Go.
 
 ## Requirements
 * Go 1.6+
-* MySQL 5.6+ \*
-\* Previous versions may still work but never tested
+* MySQL 5.6+ (Previous versions may still work but never tested)
 
 ## Quick start
 

@@ -4,12 +4,15 @@ import (
   "testing"
   "os"
   "fmt"
+  "flag"
 )
 
+var dbConfPath = flag.String("config", "../config/database.json", "path to database config file")
+var migrationPath = flag.String("m", "../migrations", "path to migration directory")
+
 func TestMain(m *testing.M) {
-  dbConfPath := "../config/database.json"
-  migrationPath := "../migrations"
-  errors := Migrate(dbConfPath, migrationPath, true)
+  flag.Parse()
+  errors := Migrate(*dbConfPath, *migrationPath, true)
   if len(errors) > 0 {
     fmt.Printf("Errors:\n")
     for i := 0; i < len(errors); i++ {
@@ -17,13 +20,13 @@ func TestMain(m *testing.M) {
     }
     os.Exit(1)
   }
-  err := InitDbConnection(dbConfPath, true)
+  err := InitDbConnection(*dbConfPath, true)
   if err != nil {
     fmt.Printf("Error: %s\n", err.Error())
     os.Exit(1)
   }
   res := m.Run()
-  errors = Rollback(dbConfPath, migrationPath, true)
+  errors = Rollback(*dbConfPath, *migrationPath, true)
   if len(errors) > 0 {
     fmt.Printf("Errors:\n")
     for i := 0; i < len(errors); i++ {

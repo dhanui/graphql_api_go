@@ -2,7 +2,7 @@ package main
 
 import (
   "fmt"
-  "os"
+  "flag"
   "net/http"
   "encoding/json"
 
@@ -41,39 +41,51 @@ func printErrors(errors []error) {
   }
 }
 
+var dbConfPath = flag.String("config", "./config/database.json", "path to database config file")
+var migrationPath = flag.String("m", "./migrations", "path to migration directory")
+
 func main() {
-  if len(os.Args) == 2 {
-    dbConfPath := "config/database.json"
-    migrationPath := "migrations"
-    switch os.Args[1] {
+  flag.Parse()
+  args := flag.Args()
+  if len(args) == 1 {
+    switch args[0] {
     case "migrate":
-      errors := repository.Migrate(dbConfPath, migrationPath, false)
+      errors := repository.Migrate(*dbConfPath, *migrationPath, false)
       if len(errors) > 0 {
-        fmt.Printf("Migration errors:\n")
+        fmt.Println("Migration errors:")
         printErrors(errors)
       }
     case "rollback":
-      errors := repository.Rollback(dbConfPath, migrationPath, false)
+      errors := repository.Rollback(*dbConfPath, *migrationPath, false)
       if len(errors) > 0 {
-        fmt.Printf("Rollback errors:\n")
+        fmt.Println("Rollback errors:")
         printErrors(errors)
       }
     case "server":
-      err := repository.InitDbConnection(dbConfPath, false)
+      err := repository.InitDbConnection(*dbConfPath, false)
       if (err != nil) {
         fmt.Printf("Error initializing database connection: %s\n", err.Error())
         return
       }
       http.HandleFunc("/graphql", graphqlHandler)
-      fmt.Printf("HTTP server listening on port 8080...\n")
+      fmt.Println("HTTP server listening on port 8080...")
       err = http.ListenAndServe(":8080", nil)
       if err != nil {
         fmt.Printf("Error starting HTTP server: %s\n", err.Error())
       }
     default:
-      fmt.Printf("Unknown argument: %s\n", os.Args[1])
+      fmt.Printf("Unknown command: %s\n", args[0])
     }
   } else {
-    fmt.Printf("Usage: graphql_api_go [command]\n\nCommands:\n  migrate\tMigrate database\n  rollback\tRollback database\n  server\tStart HTTP server\n")
+    fmt.Println("Usage: graphql_api_go [flags] [command]")
+    fmt.Println()
+    fmt.Println("Flags:")
+    fmt.Println("  -config string    path to database config file (default: ./config/database.json)")
+    fmt.Println("  -m string         path to migration directory (default: ./migrations)")
+    fmt.Println()
+    fmt.Println("Commands:")
+    fmt.Println("  migrate           migrate database")
+    fmt.Println("  rollback          rollback database")
+    fmt.Println("  server            start HTTP server")
   }
 }

@@ -4,7 +4,7 @@ import (
   "github.com/graphql-go/graphql"
 )
 
-var rootQuery = graphql.NewObject(graphql.ObjectConfig{
+var rootQueryType = graphql.NewObject(graphql.ObjectConfig{
   Name: "RootQuery",
   Fields: graphql.Fields{
     "todo": &graphql.Field{

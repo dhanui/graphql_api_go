@@ -6,15 +6,15 @@ import (
   "net/http"
   "encoding/json"
 
-  "github.com/dhanui/graphql_api_go/models"
+  "github.com/dhanui/graphql_api_go/repository"
   "github.com/dhanui/graphql_api_go/schema"
 )
 
 func graphqlHandler(w http.ResponseWriter, r *http.Request) {
   username, password, ok := r.BasicAuth()
-  var user models.User
+  var user repository.User
   if ok {
-    user, ok = models.AuthenticateUser(username, password)
+    user, ok = repository.AuthenticateUser(username, password)
   }
   if !ok {
     http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -47,19 +47,19 @@ func main() {
     migrationPath := "migrations"
     switch os.Args[1] {
     case "migrate":
-      errors := models.Migrate(dbConfPath, migrationPath, false)
+      errors := repository.Migrate(dbConfPath, migrationPath, false)
       if len(errors) > 0 {
         fmt.Printf("Migration errors:\n")
         printErrors(errors)
       }
     case "rollback":
-      errors := models.Rollback(dbConfPath, migrationPath, false)
+      errors := repository.Rollback(dbConfPath, migrationPath, false)
       if len(errors) > 0 {
         fmt.Printf("Rollback errors:\n")
         printErrors(errors)
       }
     case "server":
-      err := models.InitDbConnection(dbConfPath, false)
+      err := repository.InitDbConnection(dbConfPath, false)
       if (err != nil) {
         fmt.Printf("Error initializing database connection: %s\n", err.Error())
         return

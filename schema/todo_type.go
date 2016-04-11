@@ -3,7 +3,7 @@ package schema
 import (
   "github.com/graphql-go/graphql"
 
-  "github.com/dhanui/graphql_api_go/models"
+  "github.com/dhanui/graphql_api_go/repository"
 )
 
 var todoType = graphql.NewObject(graphql.ObjectConfig{
@@ -35,7 +35,7 @@ func createTodo(params graphql.ResolveParams) (interface{}, error) {
   title, _ := params.Args["title"].(string)
   body, _ := params.Args["body"].(string)
   userId, _ := params.Args["user_id"].(int)
-  newTodo := models.Todo{
+  newTodo := repository.Todo{
     Title: title,
     Body: body,
     UserId: userId,
@@ -50,7 +50,7 @@ func createTodo(params graphql.ResolveParams) (interface{}, error) {
 
 func updateTodo(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-  todo, err := models.GetTodo(id)
+  todo, err := repository.GetTodo(id)
   if err != nil {
     return nil, err
   }
@@ -76,7 +76,7 @@ func updateTodo(params graphql.ResolveParams) (interface{}, error) {
 
 func deleteTodo(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-  todo, err := models.GetTodo(id)
+  todo, err := repository.GetTodo(id)
   if err != nil {
     return nil, err
   }
@@ -90,7 +90,7 @@ func deleteTodo(params graphql.ResolveParams) (interface{}, error) {
 
 func getTodo(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-  todo, err := models.GetTodo(id)
+  todo, err := repository.GetTodo(id)
   if err != nil {
     return nil, err
   } else {
@@ -100,12 +100,12 @@ func getTodo(params graphql.ResolveParams) (interface{}, error) {
 
 func getTodoList(params graphql.ResolveParams) (interface{}, error) {
   userId, ok := params.Args["user_id"].(int)
-  var todos []models.Todo
+  var todos []repository.Todo
   var err error
   if ok {
-    todos, err = models.GetTodoListFilteredByUserId(userId)
+    todos, err = repository.GetTodoListFilteredByUserId(userId)
   } else {
-    todos, err = models.GetTodoList()
+    todos, err = repository.GetTodoList()
   }
   if err != nil {
     return nil, err

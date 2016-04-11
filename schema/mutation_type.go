@@ -4,7 +4,7 @@ import (
   "github.com/graphql-go/graphql"
 )
 
-var rootMutation = graphql.NewObject(graphql.ObjectConfig{
+var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
   Name: "RootMutation",
   Fields: graphql.Fields{
     "createTodo": &graphql.Field{

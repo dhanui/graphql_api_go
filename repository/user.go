@@ -1,9 +1,9 @@
-package models
+package repository
 
 import (
   "time"
 
-  "github.com/dhanui/graphql_api_go/helpers"
+  "github.com/dhanui/graphql_api_go/helper"
 )
 
 type User struct {
@@ -15,7 +15,7 @@ type User struct {
 }
 
 func (user *User) Create(password string) (err error) {
-  passwordHash, err := helpers.CreateHash(password)
+  passwordHash, err := helper.CreateHash(password)
   if err != nil {
     return
   }
@@ -99,6 +99,6 @@ func AuthenticateUser(username string, password string) (user User, ok bool) {
   if err != nil {
     return user, false
   } else {
-    return user, helpers.ValidateHash(password, passwordHash)
+    return user, helper.ValidateHash(password, passwordHash)
   }
 }

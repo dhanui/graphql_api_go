@@ -3,7 +3,7 @@ package schema
 import (
   "github.com/graphql-go/graphql"
 
-  "github.com/dhanui/graphql_api_go/models"
+  "github.com/dhanui/graphql_api_go/repository"
 )
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -31,7 +31,7 @@ func createUser(params graphql.ResolveParams) (interface{}, error) {
   name, _ := params.Args["name"].(string)
   email, _ := params.Args["email"].(string)
   password, _ := params.Args["password"].(string)
-  newUser := models.User{
+  newUser := repository.User{
     Name: name,
     Email: email,
   }
@@ -45,7 +45,7 @@ func createUser(params graphql.ResolveParams) (interface{}, error) {
 
 func updateUser(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-  user, err := models.GetUser(id)
+  user, err := repository.GetUser(id)
   if err != nil {
     return nil, err
   }
@@ -67,7 +67,7 @@ func updateUser(params graphql.ResolveParams) (interface{}, error) {
 
 func deleteUser(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
-  user, err := models.GetUser(id)
+  user, err := repository.GetUser(id)
   if err != nil {
     return nil, err
   }
@@ -82,7 +82,7 @@ func deleteUser(params graphql.ResolveParams) (interface{}, error) {
 func getUser(params graphql.ResolveParams) (interface{}, error) {
   id, _ := params.Args["id"].(int)
 
-  user, err := models.GetUser(id)
+  user, err := repository.GetUser(id)
   if err != nil {
     return nil, err
   } else {
@@ -91,8 +91,8 @@ func getUser(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func getUserFromTodo(params graphql.ResolveParams) (interface{}, error) {
-  todo, _ := params.Source.(models.Todo)
-  user, err := models.GetUser(todo.UserId)
+  todo, _ := params.Source.(repository.Todo)
+  user, err := repository.GetUser(todo.UserId)
   if err != nil {
     return nil, err
   } else {
@@ -101,7 +101,7 @@ func getUserFromTodo(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func getUserList(params graphql.ResolveParams) (interface{}, error) {
-  users, err := models.GetUserList()
+  users, err := repository.GetUserList()
   if err != nil {
     return nil, err
   } else {

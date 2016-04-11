@@ -6,15 +6,15 @@ import (
   "github.com/graphql-go/graphql"
   "golang.org/x/net/context"
 
-  "github.com/dhanui/graphql_api_go/models"
+  "github.com/dhanui/graphql_api_go/repository"
 )
 
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
-  Query: rootQuery,
-  Mutation: rootMutation,
+  Query: rootQueryType,
+  Mutation: rootMutationType,
 })
 
-func ExecuteQuery(query string, user models.User) *graphql.Result {
+func ExecuteQuery(query string, user repository.User) *graphql.Result {
   result := graphql.Do(graphql.Params{
     Schema: schema,
     RequestString: query,

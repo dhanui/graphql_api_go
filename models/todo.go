@@ -19,7 +19,7 @@ func (todo *Todo) Create() (err error) {
     return
   }
   defer tx.Rollback()
-  todo.CreatedAt = time.Now()
+  todo.CreatedAt = time.Now().UTC().Round(time.Second)
   todo.UpdatedAt = todo.CreatedAt
   res, err := tx.Exec("INSERT INTO todos(title, body, user_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?)", todo.Title, todo.Body, todo.UserId, todo.CreatedAt, todo.UpdatedAt)
   if err != nil {
@@ -40,7 +40,7 @@ func (todo *Todo) Update() (err error) {
     return
   }
   defer tx.Rollback()
-  todo.UpdatedAt = time.Now()
+  todo.UpdatedAt = time.Now().UTC().Round(time.Second)
   _, err = tx.Exec("UPDATE todos SET title = ?, body = ?, user_id = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL", todo.Title, todo.Body, todo.UserId, todo.UpdatedAt, todo.Id)
   if err != nil {
     return
@@ -55,7 +55,7 @@ func (todo *Todo) Delete() (err error) {
     return
   }
   defer tx.Rollback()
-  _, err = tx.Exec("UPDATE todos SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL", time.Now(), todo.Id)
+  _, err = tx.Exec("UPDATE todos SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL", time.Now().UTC().Round(time.Second), todo.Id)
   if err != nil {
     return
   }

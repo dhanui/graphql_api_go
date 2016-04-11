@@ -43,25 +43,23 @@ func printErrors(errors []error) {
 
 func main() {
   if len(os.Args) == 2 {
+    dbConfPath := "config/database.json"
+    migrationPath := "migrations"
     switch os.Args[1] {
     case "migrate":
-      errors := models.Migrate()
+      errors := models.Migrate(dbConfPath, migrationPath, false)
       if len(errors) > 0 {
-        fmt.Println("Migration errors:")
+        fmt.Printf("Migration errors:\n")
         printErrors(errors)
-      } else {
-        fmt.Println("Migration successful")
       }
     case "rollback":
-      errors := models.Rollback()
+      errors := models.Rollback(dbConfPath, migrationPath, false)
       if len(errors) > 0 {
-        fmt.Println("Rollback errors:")
+        fmt.Printf("Rollback errors:\n")
         printErrors(errors)
-      } else {
-        fmt.Println("Rollback successful")
       }
     case "server":
-      err := models.InitDBConnection()
+      err := models.InitDbConnection(dbConfPath, false)
       if (err != nil) {
         fmt.Printf("Error initializing database connection: %s\n", err.Error())
         return
@@ -76,6 +74,6 @@ func main() {
       fmt.Printf("Unknown argument: %s\n", os.Args[1])
     }
   } else {
-    fmt.Println("Usage: graphql_api_go [command]\n\nCommands:\n  migrate\tMigrate database\n  rollback\tRollback database\n  server\tStart HTTP server\n")
+    fmt.Printf("Usage: graphql_api_go [command]\n\nCommands:\n  migrate\tMigrate database\n  rollback\tRollback database\n  server\tStart HTTP server\n")
   }
 }

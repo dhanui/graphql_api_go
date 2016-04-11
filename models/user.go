@@ -24,7 +24,7 @@ func (user *User) Create(password string) (err error) {
     return
   }
   defer tx.Rollback()
-  user.CreatedAt = time.Now()
+  user.CreatedAt = time.Now().UTC().Round(time.Second)
   user.UpdatedAt = user.CreatedAt
   res, err := tx.Exec("INSERT INTO users(name, email, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?, ?)", user.Name, user.Email, passwordHash, user.CreatedAt, user.UpdatedAt)
   if err != nil {
@@ -45,7 +45,7 @@ func (user *User) Update() (err error) {
     return
   }
   defer tx.Rollback()
-  user.UpdatedAt = time.Now()
+  user.UpdatedAt = time.Now().UTC().Round(time.Second)
   _, err = tx.Exec("UPDATE users SET name = ?, email = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL", user.Name, user.Email, user.UpdatedAt, user.Id)
   if err != nil {
     return
@@ -60,7 +60,7 @@ func (user *User) Delete() (err error) {
     return
   }
   defer tx.Rollback()
-  _, err = tx.Exec("UPDATE users SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL", time.Now(), user.Id)
+  _, err = tx.Exec("UPDATE users SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL", time.Now().UTC().Round(time.Second), user.Id)
   if err != nil {
     return
   }

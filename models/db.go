@@ -11,7 +11,7 @@ import (
   _ "github.com/mattes/migrate/driver/mysql"
 )
 
-type DBConf struct {
+type DbParams struct {
   Host string `json:"host"`
   Port string `json:"port"`
   User string `json:"user"`
@@ -19,31 +19,37 @@ type DBConf struct {
   Name string `json:"name"`
 }
 
-var db *sql.DB
-
-func loadConnectionString() (connString string, err error) {
-  fmt.Printf("Loading database configuration...\n")
-  file, err := os.Open("config/database.json")
-  if err != nil {
-    return
-  }
-  decoder := json.NewDecoder(file)
-  dbConf := DBConf{}
-  err = decoder.Decode(&dbConf)
-  if err != nil {
-    return
-  } else {
-    fmt.Printf("Configuration loaded\n")
-  }
-  return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbConf.User, dbConf.Pass, dbConf.Host, dbConf.Port, dbConf.Name), nil
+type DbConf struct {
+  Db DbParams `json:"db"`
+  TestDb DbParams `json:"test_db"`
 }
 
-func InitDBConnection() (err error) {
-  connString, err := loadConnectionString()
+var db *sql.DB
+
+func loadConnectionString(dbConfPath string, test bool) (connString string, err error) {
+  file, err := os.Open(dbConfPath)
   if err != nil {
     return
   }
-  fmt.Printf("Testing database connection...\n")
+  dbConf := DbConf{}
+  err = json.NewDecoder(file).Decode(&dbConf)
+  if err != nil {
+    return
+  }
+  var dbParams DbParams
+  if test {
+    dbParams = dbConf.TestDb
+  } else {
+    dbParams = dbConf.Db
+  }
+  return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbParams.User, dbParams.Pass, dbParams.Host, dbParams.Port, dbParams.Name), nil
+}
+
+func InitDbConnection(dbConfPath string, test bool) (err error) {
+  connString, err := loadConnectionString(dbConfPath, test)
+  if err != nil {
+    return
+  }
   db, err = sql.Open("mysql", connString)
   if err != nil {
     return
@@ -52,26 +58,25 @@ func InitDBConnection() (err error) {
   if err != nil {
     return
   }
-  fmt.Printf("Connection successful\n")
   return
 }
 
-func Migrate() (errors []error) {
-  connString, err := loadConnectionString()
+func Migrate(dbConfPath string, migrationPath string, test bool) (errors []error) {
+  connString, err := loadConnectionString(dbConfPath, test)
   if err != nil {
     return append(errors, err)
   }
   url := fmt.Sprintf("mysql://%s", connString)
-  errors, _ = migrate.UpSync(url, "./migrations")
+  errors, _ = migrate.UpSync(url, migrationPath)
   return
 }
 
-func Rollback() (errors []error) {
-  connString, err := loadConnectionString()
+func Rollback(dbConfPath string, migrationPath string, test bool) (errors []error) {
+  connString, err := loadConnectionString(dbConfPath, test)
   if err != nil {
     return append(errors, err)
   }
   url := fmt.Sprintf("mysql://%s", connString)
-  errors, _ = migrate.DownSync(url, "./migrations")
+  errors, _ = migrate.DownSync(url, migrationPath)
   return
 }

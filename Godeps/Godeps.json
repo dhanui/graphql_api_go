@@ -1,0 +1,94 @@
+{
+	"ImportPath": "github.com/dhanui/graphql_api_go",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v60",
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-125-gd512f20",
+			"Rev": "d512f204a577a4ab037a1816604c48c9c13210be"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/gqlerrors",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/ast",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/kinds",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/lexer",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/location",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/parser",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/printer",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/source",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/graphql-go/graphql/language/visitor",
+			"Rev": "ac8b40ba2be38115622fc4fcda3805662575cfa7"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/driver",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/driver/mysql",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/file",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/migrate",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/migrate/direction",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "github.com/mattes/migrate/pipe",
+			"Comment": "v1.2.0-70-gce1b59b",
+			"Rev": "ce1b59bb819416ca67422929b1cb48bb342720b6"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "552e9d568fde9701ea1944fb01c8aadaceaa7353"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "552e9d568fde9701ea1944fb01c8aadaceaa7353"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "35b06af0720201bc2f326773a80767387544f8c4"
+		}
+	]
+}

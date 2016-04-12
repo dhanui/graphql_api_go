@@ -41,8 +41,9 @@ func printErrors(errors []error) {
   }
 }
 
-var dbConfPath = flag.String("config", "./config/database.json", "path to database config file")
+var dbConfPath = flag.String("C", "./config/database.json", "path to database config file")
 var migrationPath = flag.String("m", "./migrations", "path to migration directory")
+var port = flag.Int("p", 8080, "HTTP port")
 
 func main() {
   flag.Parse()
@@ -68,8 +69,8 @@ func main() {
         return
       }
       http.HandleFunc("/graphql", graphqlHandler)
-      fmt.Println("HTTP server listening on port 8080...")
-      err = http.ListenAndServe(":8080", nil)
+      fmt.Printf("HTTP server listening on port %d...\n", *port)
+      err = http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
       if err != nil {
         fmt.Printf("Error starting HTTP server: %s\n", err.Error())
       }
@@ -80,12 +81,13 @@ func main() {
     fmt.Println("Usage: graphql_api_go [flags] [command]")
     fmt.Println()
     fmt.Println("Flags:")
-    fmt.Println("  -config string    path to database config file (default: ./config/database.json)")
-    fmt.Println("  -m string         path to migration directory (default: ./migrations)")
+    fmt.Println("  -C string    path to database config file (default: ./config/database.json)")
+    fmt.Println("  -m string    path to migration directory (default: ./migrations)")
+    fmt.Println("  -p int       HTTP port (default: 8080)")
     fmt.Println()
     fmt.Println("Commands:")
-    fmt.Println("  migrate           migrate database")
-    fmt.Println("  rollback          rollback database")
-    fmt.Println("  server            start HTTP server")
+    fmt.Println("  migrate      migrate database")
+    fmt.Println("  rollback     rollback database")
+    fmt.Println("  server       start HTTP server")
   }
 }

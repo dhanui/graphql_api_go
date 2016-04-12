@@ -7,7 +7,7 @@ import (
   "flag"
 )
 
-var dbConfPath = flag.String("config", "../config/database.json", "path to database config file")
+var dbConfPath = flag.String("C", "../config/database.json", "path to database config file")
 var migrationPath = flag.String("m", "../migrations", "path to migration directory")
 
 func TestMain(m *testing.M) {

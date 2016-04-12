@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/dhanui/graphql_api_go",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v60",
+	"GodepVersion": "v62",
 	"Deps": [
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",

@@ -27,6 +27,10 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
   },
 })
 
+func getCurrentUser(params graphql.ResolveParams) (interface{}, error) {
+  return params.Context.Value("currentUser"), nil
+}
+
 func createUser(params graphql.ResolveParams) (interface{}, error) {
   name, _ := params.Args["name"].(string)
   email, _ := params.Args["email"].(string)

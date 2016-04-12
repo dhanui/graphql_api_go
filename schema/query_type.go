@@ -7,6 +7,11 @@ import (
 var queryType = graphql.NewObject(graphql.ObjectConfig{
   Name: "Query",
   Fields: graphql.Fields{
+    "me": &graphql.Field{
+      Description: "Get current user",
+      Type: userType,
+      Resolve: getCurrentUser,
+    },
     "todo": &graphql.Field{
       Description: "Get a todo",
       Type: todoType,

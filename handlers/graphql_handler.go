@@ -8,11 +8,13 @@ import (
 )
 
 func GraphqlHandler(w http.ResponseWriter, r *http.Request) {
-  user, ok := basicAuth(r)
-  if !ok {
-    http.Error(w, "Unauthorized", http.StatusUnauthorized)
-  } else {
-    if r.Method == "POST" {
+  cors(&w)
+  switch r.Method {
+  case "POST":
+    user, ok := basicAuth(r)
+    if !ok {
+      http.Error(w, "Unauthorized", http.StatusUnauthorized)
+    } else {
       body := make([]byte, r.ContentLength)
       _, err := r.Body.Read(body)
       if err != nil {
@@ -22,8 +24,9 @@ func GraphqlHandler(w http.ResponseWriter, r *http.Request) {
       } else {
         http.Error(w, "Bad Request", http.StatusBadRequest)
       }
-    } else {
-      http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
     }
+  case "OPTIONS":
+  default:
+    http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
   }
 }

@@ -4,46 +4,20 @@ import (
   "fmt"
   "flag"
   "net/http"
-  "encoding/json"
 
   "github.com/dhanui/graphql_api_go/repository"
-  "github.com/dhanui/graphql_api_go/schema"
+  "github.com/dhanui/graphql_api_go/handlers"
 )
 
-func graphqlHandler(w http.ResponseWriter, r *http.Request) {
-  username, password, ok := r.BasicAuth()
-  var user repository.User
-  if ok {
-    user, ok = repository.AuthenticateUser(username, password)
-  }
-  if !ok {
-    http.Error(w, "Unauthorized", http.StatusUnauthorized)
-    return
-  }
-  if r.Method == "POST" {
-    body := make([]byte, r.ContentLength)
-    _, err := r.Body.Read(body)
-    if err != nil {
-      result := schema.ExecuteQuery(string(body[:]), user)
-      w.Header().Set("Content-Type", "application/json")
-      json.NewEncoder(w).Encode(result)
-    } else {
-      http.Error(w, "Bad Request", http.StatusBadRequest)
-    }
-  } else {
-    http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-  }
-}
+var dbConfPath = flag.String("C", "./config/database.json", "path to database config file")
+var migrationPath = flag.String("m", "./migrations", "path to migration directory")
+var port = flag.Int("p", 8080, "HTTP port")
 
 func printErrors(errors []error) {
   for i := 0; i < len(errors); i++ {
     fmt.Printf("* %s\n", errors[i].Error())
   }
 }
-
-var dbConfPath = flag.String("C", "./config/database.json", "path to database config file")
-var migrationPath = flag.String("m", "./migrations", "path to migration directory")
-var port = flag.Int("p", 8080, "HTTP port")
 
 func main() {
   flag.Parse()
@@ -68,7 +42,7 @@ func main() {
         fmt.Printf("Error initializing database connection: %s\n", err.Error())
         return
       }
-      http.HandleFunc("/graphql", graphqlHandler)
+      http.HandleFunc("/graphql", handlers.GraphqlHandler)
       fmt.Printf("HTTP server listening on port %d...\n", *port)
       err = http.ListenAndServe(fmt.Sprintf(":%d", *port), nil)
       if err != nil {

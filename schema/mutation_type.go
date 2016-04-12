@@ -4,10 +4,11 @@ import (
   "github.com/graphql-go/graphql"
 )
 
-var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
-  Name: "RootMutation",
+var mutationType = graphql.NewObject(graphql.ObjectConfig{
+  Name: "Mutation",
   Fields: graphql.Fields{
     "createTodo": &graphql.Field{
+      Description: "Create new to do",
       Type: todoType,
       Args: graphql.FieldConfigArgument{
         "title": &graphql.ArgumentConfig{
@@ -23,6 +24,7 @@ var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: createTodo,
     },
     "updateTodo": &graphql.Field{
+      Description: "Update existing to do",
       Type: todoType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
@@ -41,6 +43,7 @@ var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: updateTodo,
     },
     "deleteTodo": &graphql.Field{
+      Description: "Delete existing to do",
       Type: todoType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
@@ -50,6 +53,7 @@ var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: deleteTodo,
     },
     "createUser": &graphql.Field{
+      Description: "Create new user",
       Type: userType,
       Args: graphql.FieldConfigArgument{
         "name": &graphql.ArgumentConfig{
@@ -65,6 +69,7 @@ var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: createUser,
     },
     "updateUser": &graphql.Field{
+      Description: "Update existing user",
       Type: userType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
@@ -80,6 +85,7 @@ var rootMutationType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: updateUser,
     },
     "deleteUser": &graphql.Field{
+      Description: "Delete existing user",
       Type: userType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{

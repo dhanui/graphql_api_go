@@ -4,10 +4,11 @@ import (
   "github.com/graphql-go/graphql"
 )
 
-var rootQueryType = graphql.NewObject(graphql.ObjectConfig{
-  Name: "RootQuery",
+var queryType = graphql.NewObject(graphql.ObjectConfig{
+  Name: "Query",
   Fields: graphql.Fields{
     "todo": &graphql.Field{
+      Description: "Get a todo",
       Type: todoType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
@@ -17,6 +18,7 @@ var rootQueryType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: getTodo,
     },
     "todoList": &graphql.Field{
+      Description: "Get list of todo",
       Type: graphql.NewList(todoType),
       Args: graphql.FieldConfigArgument{
         "user_id": &graphql.ArgumentConfig{
@@ -26,6 +28,7 @@ var rootQueryType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: getTodoList,
     },
     "user": &graphql.Field{
+      Description: "Get a user",
       Type: userType,
       Args: graphql.FieldConfigArgument{
         "id": &graphql.ArgumentConfig{
@@ -35,6 +38,7 @@ var rootQueryType = graphql.NewObject(graphql.ObjectConfig{
       Resolve: getUser,
     },
     "userList": &graphql.Field{
+      Description: "Get list of user",
       Type: graphql.NewList(userType),
       Resolve: getUserList,
     },

@@ -10,8 +10,8 @@ import (
 )
 
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
-  Query: rootQueryType,
-  Mutation: rootMutationType,
+  Query: queryType,
+  Mutation: mutationType,
 })
 
 func ExecuteQuery(query string, user repository.User) *graphql.Result {
